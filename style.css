@@ -1,6 +1,4 @@
-/*
-  
-  later the properties like x,hue,size,duration to be change dynamically
+/* later the properties like x,hue,size,duration to be change dynamically
 */
 
 html,
@@ -40,31 +38,15 @@ body {
     0 0 3px 1px hsl(var(--hue) 85% 70% / 0.9),
     0 0 12px 4px hsl(var(--hue) 90% 62% / 0.55),
     0 0 26px 10px hsl(var(--hue) 90% 55% / 0.22);
-  animation: pulse var(--duration, 4s) ease-in-out var(--delay, 0s) infinite;
+ 
 }
 
-/* Quick rise, slower decay — closer to how a real firefly flashes than a
-   symmetric sine pulse would look. */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.18;
-    transform: scale(0.8);
-  }
-  10% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-  32% {
-    opacity: 0.4;
-    transform: scale(0.92);
-  }
-}
+
 
 @media (prefers-reduced-motion: reduce) {
   .firefly {
-    animation: none;
-    opacity: 0.75;
+    
+     opacity: 0.75 !important;
   }
 }
 

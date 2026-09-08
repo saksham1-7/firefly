@@ -1,0 +1,74 @@
+/*
+  
+  later the properties like x,hue,size,duration to be change dynamically
+*/
+
+html,
+body {
+  height: 100%;
+}
+
+.night-sky {
+  margin: 0;
+  min-height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 28% 74%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 44% 32%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 62% 8%, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(1px 1px at 77% 58%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 88% 22%, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(1px 1px at 6% 52%, rgba(255, 255, 255, 0.18), transparent),
+    radial-gradient(1px 1px at 95% 80%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 52% 88%, rgba(255, 255, 255, 0.22), transparent),
+    radial-gradient(1px 1px at 20% 4%, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(ellipse 80% 60% at 50% 10%, rgba(255, 255, 255, 0.04), transparent 60%),
+    linear-gradient(180deg, #05070d 0%, #0a0f1c 55%, #121a2c 100%);
+}
+
+.firefly {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size, 8px);
+  height: var(--size, 8px);
+  border-radius: 50%;
+  background: hsl(calc(var(--hue) + 15) 70% 88%);
+  box-shadow:
+    0 0 3px 1px hsl(var(--hue) 85% 70% / 0.9),
+    0 0 12px 4px hsl(var(--hue) 90% 62% / 0.55),
+    0 0 26px 10px hsl(var(--hue) 90% 55% / 0.22);
+  animation: pulse var(--duration, 4s) ease-in-out var(--delay, 0s) infinite;
+}
+
+/* Quick rise, slower decay — closer to how a real firefly flashes than a
+   symmetric sine pulse would look. */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(0.8);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  32% {
+    opacity: 0.4;
+    transform: scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .firefly {
+    animation: none;
+    opacity: 0.75;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #edf0f6;
+  outline-offset: 2px;
+}

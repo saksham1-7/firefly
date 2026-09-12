@@ -43,12 +43,12 @@ body {
 
 
 
-@media (prefers-reduced-motion: reduce) {
+/* @media (prefers-reduced-motion: reduce) {
   .firefly {
     
      opacity: 0.75 !important;
   }
-}
+} */
 
 :focus-visible {
   outline: 2px solid #edf0f6;

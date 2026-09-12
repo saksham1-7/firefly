@@ -11,7 +11,7 @@ const io = new Server(server);
 app.use(express.static(path.join(__dirname)));
 
 const phaseMap = new Map();
-
+const swarm = new Map();
 io.on('connection',(socket) => {
     console.log(`firefly arrived : ${socket.id}`);
 
@@ -19,18 +19,20 @@ socket.on('phase',(phase) => {
   phaseMap.set(socket.id,phase);
     console.log(`socket ${socket.id} is in phase ${phase}`);
 })
-
+socket.on('firefly:state',(data) => {
+  swarm.set(socket.id,data);
+});
     socket.on('disconnect', () => {
-       phaseMap.delete(socket.id);
-    socket.broadcast.emit('userDisconnected',socket.id);
+       swarm.delete(socket.id);
+    io.broadcast.emit('userDisconnected',socket.id);
     console.log(`firefly left: ${socket.id}`);
   });
 
 });
 
 setInterval(()=> {
-    const phases = Object.fromEntries(phaseMap);
-    io.emit('phases',phases);
+   
+  io.emit('swarm:sync',Object.fromEntries(swarm));
   },100);
 
 

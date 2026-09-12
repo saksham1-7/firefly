@@ -22,8 +22,30 @@ fireflies.set(id, { phase, frequency, dot });
 socket.on('connect', () => {
     myId = socket.id;
     addFirefly(myId, Math.random() * Math.PI * 2, 0.8 + Math.random() * 0.6);
-})
+setInterval(() => {
+    const me = fireflies.get(myId);
+    if (me)
+        socket.emit('firefly:state',{phase : me.phase,frequency:me.frequency,})
 
+},100);
+
+});
+
+socket.on('swarm:sync',(snap)=> {
+
+    for (const [id,data] of Object.entries(snap))
+{        if (id === myId) continue;
+    if(!fireflies.has(id)) {
+
+        addFirefly(id,data.phase,data.frequency);
+    }
+    else {
+        const f = fireflies.get(id);
+        f.frequency = data.frequency;
+        f.phase = data.phase;
+    }}
+
+})
 
 let lastTime = performance.now();
 

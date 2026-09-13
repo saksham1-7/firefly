@@ -5,7 +5,7 @@ const socket = io();
 
 const fireflies = new Map();
 let myId = null;
-
+let couplingStrength = 0.15
 function addFirefly(id,phase,frequency,x,y,isMine = false) {
 
 const dot = document.createElement('div');
@@ -39,8 +39,7 @@ socket.on('swarm:sync',(snap)=> {
            const correction = others.reduce(
         (sum, [, data]) => sum + Math.sin(data.phase - me.phase), 0
       ) / others.length;
-      const k = 0.15;
-      me.phase += k * correction;
+      me.phase += couplingStrength * correction;
         }
     }
 
@@ -90,3 +89,11 @@ setInterval(() => {
     if (me) 
         socket.emit('firefly:phase',me.phase);
 }, 100);
+
+const couplingSlider = document.querySelector('#coupling-slider');
+const couplingValue = document.querySelector('#coupling-value');
+
+couplingSlider.addEventListener('input', () => {
+  couplingStrength = parseFloat(couplingSlider.value);
+  couplingValue.textContent = couplingStrength.toFixed(2);
+});

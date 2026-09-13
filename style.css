@@ -49,7 +49,7 @@ body {
         0 0 3px 1px hsl(var(--hue) 85% 70% / 0.9),
         0 0 12px 4px hsl(var(--hue) 90% 62% / 0.55),
         0 0 26px 10px hsl(var(--hue) 90% 55% / 0.22),
-        0 0 0 7px rgba(255, 50, 50, 0.3);
+        0 0 0 5px rgba(237, 240, 246, 0.18);
 }
 
 
@@ -59,7 +59,41 @@ body {
      opacity: 0.75 !important;
   }
 } */
+.coupling-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 160px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(237, 240, 246, 0.15);
+  outline: none;
+}
 
+.coupling-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: hsl(55 90% 75%);
+  box-shadow: 0 0 8px 2px hsl(55 90% 65% / 0.6);
+  cursor: pointer;
+}
+
+.coupling-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: none;
+  border-radius: 50%;
+  background: hsl(55 90% 75%);
+  box-shadow: 0 0 8px 2px hsl(55 90% 65% / 0.6);
+  cursor: pointer;
+}
+
+.coupling-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(237, 240, 246, 0.15);
+}
 :focus-visible {
   outline: 2px solid #edf0f6;
   outline-offset: 2px;

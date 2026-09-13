@@ -6,12 +6,15 @@ const socket = io();
 const fireflies = new Map();
 let myId = null;
 
-function addFirefly(id,phase,frequency) {
+function addFirefly(id,phase,frequency,x,y,isMine = false) {
 
 const dot = document.createElement('div');
 dot.className = 'firefly';
-dot.style.setProperty('--x', `${5 + Math.random() * 90}%`);
-dot.style.setProperty('--y', `${5 + Math.random() * 90}%`);
+if (isMine) {
+    dot.classList.add('my-firefly');
+}
+dot.style.setProperty('--x', `${x}%`);
+dot.style.setProperty('--y', `${y}%`);
 dot.style.setProperty('--hue', Math.floor(40 + Math.random() * 30));
 dot.style.setProperty('--size', '10px');
 field.appendChild(dot);
@@ -21,32 +24,49 @@ fireflies.set(id, { phase, frequency, dot });
 
 socket.on('connect', () => {
     myId = socket.id;
-    addFirefly(myId, Math.random() * Math.PI * 2, 0.8 + Math.random() * 0.6);
-setInterval(() => {
-    const me = fireflies.get(myId);
-    if (me)
-        socket.emit('firefly:state',{phase : me.phase,frequency:me.frequency,})
-
-},100);
+   console.log('My ID:', myId);
+    
 
 });
 
 socket.on('swarm:sync',(snap)=> {
 
+    const me = fireflies.get(myId);
+
+    if (me) {
+        const others = Object.entries(snap).filter(([id]) => id != myId);
+        if (others.length > 0) {
+           const correction = others.reduce(
+        (sum, [, data]) => sum + Math.sin(data.phase - me.phase), 0
+      ) / others.length;
+      const k = 0.15;
+      me.phase += k * correction;
+        }
+    }
+
     for (const [id,data] of Object.entries(snap))
-{        if (id === myId) continue;
+{     
     if(!fireflies.has(id)) {
 
-        addFirefly(id,data.phase,data.frequency);
+        addFirefly(id,data.phase,data.frequency,data.x,data.y,id === myId);
     }
     else {
         const f = fireflies.get(id);
-        f.frequency = data.frequency;
-        f.phase = data.phase;
+        if (id !== myId)
+        {f.frequency = data.frequency;
+        f.phase = data.phase;}
     }}
-
+status.textContent = `${fireflies.size} firefl${fireflies.size === 1 ? 'y' : 'ies'} here.`;
 })
 
+socket.on('userDisconnected' , (id) => {
+    const f = fireflies.get(id);
+
+    if (!f) return;
+    f.dot.remove();
+    fireflies.delete(id);
+
+});
 let lastTime = performance.now();
 
 function tick(now) {
@@ -64,3 +84,9 @@ function tick(now) {
 }
 
 requestAnimationFrame(tick);
+
+setInterval(() => {
+    const me = fireflies.get(myId);
+    if (me) 
+        socket.emit('firefly:phase',me.phase);
+}, 100);

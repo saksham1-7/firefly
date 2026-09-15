@@ -36,8 +36,8 @@ body {
   background: hsl(calc(var(--hue) + 15) 70% 88%);
   box-shadow:
     0 0 3px 1px hsl(var(--hue) 85% 70% / 0.9),
-    0 0 12px 4px hsl(var(--hue) 90% 62% / 0.55),
-    0 0 26px 10px hsl(var(--hue) 90% 55% / 0.22);
+    0 0 12px 4px hsl(var(--hue) 90% 62% / 0.45),
+    0 0 26px 10px hsl(var(--hue) 90% 55% / 0.15);
  
 }
 
@@ -47,8 +47,8 @@ body {
 
     box-shadow:
         0 0 3px 1px hsl(var(--hue) 85% 70% / 0.9),
-        0 0 12px 4px hsl(var(--hue) 90% 62% / 0.55),
-        0 0 26px 10px hsl(var(--hue) 90% 55% / 0.22),
+        0 0 12px 4px hsl(var(--hue) 90% 62% / 0.45),
+        0 0 26px 10px hsl(var(--hue) 90% 55% / 0.15),
         0 0 0 5px rgba(237, 240, 246, 0.18);
 }
 

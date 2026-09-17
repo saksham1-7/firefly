@@ -6,7 +6,7 @@ const socket = io();
 const fireflies = new Map();
 
 let myCharge = Math.random();
-let myPeriod = 2.5 + Math.random() * 1.0;
+let myPeriod = 2.5 + Math.random() * 0.5;
 
 let couplingBoost = 0.35;
 

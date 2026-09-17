@@ -30,13 +30,8 @@ socket.on('firefly:fire', () => {
   socket.broadcast.emit('firefly:fired', socket.id);
 });
 
-  socket.on('fireflies:scatter', () => {
-    for (const [id, state] of fireflies) {
-      state.x = 5 + Math.random() * 90;
-      state.y = 5 + Math.random() * 90;
-    }
-  
-    io.emit('fireflies:scattered', Object.fromEntries(fireflies));
+  socket.on('firefly:scatter', () => {
+    io.emit('firefly:scattered');
   });
 
     socket.on('disconnect', () => {

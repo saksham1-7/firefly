@@ -5,7 +5,7 @@ const socket = io();
 
 const fireflies = new Map();
 
-let myCharge = 0;
+let myCharge = Math.random();
 let myPeriod = 2.5 + Math.random() * 1.0;
 
 let couplingBoost = 0.35;
@@ -20,11 +20,13 @@ function createDot(id,x,y,isMine) {
   if (isMine) dot.classList.add('my-firefly');
   dot.style.setProperty('--x', `${x}%`);
   dot.style.setProperty('--y', `${y}%`);
-  dot.style.setProperty('--hue', Math.floor(40 + Math.random() * 30));
+ const hue = Math.floor(40 + Math.random() * 30);
+dot.style.setProperty('--hue', hue);
+  
   dot.style.setProperty('--size', '10px');
   dot.style.opacity = '0.15';
   field.appendChild(dot);
-  fireflies.set(id, { dot, isMine, fadeTimeout: null });
+  fireflies.set(id, { dot, isMine, fadeTimeout: null,scatterTimeout: null,hue });
 }
 
 function flash(f) {
@@ -35,15 +37,15 @@ function flash(f) {
 
   f.dot.style.transition = prefersReducedMotion
     ? 'none'
-    : 'opacity 120ms ease-out';
+    : 'opacity 100ms ease-out';
   f.dot.style.opacity = '1';
 
   f.fadeTimeout = setTimeout(() => {
     f.dot.style.transition = prefersReducedMotion
       ? 'none'
-      : 'opacity 900ms ease-in';
+      : 'opacity 250ms ease-in';
     f.dot.style.opacity = '0.15';
-  }, 120);
+  }, 100);
 }
 
 function updateStatus() {
@@ -52,6 +54,17 @@ function updateStatus() {
   } here.`;
 }
 
+function scatterBlink(f) {
+    clearTimeout(f.scatterTimeout);
+    f.dot.style.setProperty('--hue', 355); 
+    f.dot.style.transition = prefersReducedMotion ? 'none' : 'opacity 80ms ease-out';
+    f.dot.style.opacity = '1';
+    f.scatterTimeout = setTimeout(() => {
+        f.dot.style.setProperty('--hue', f.hue); // back to its real color
+        f.dot.style.transition = prefersReducedMotion ? 'none' : 'opacity 500ms ease-in';
+        f.dot.style.opacity = '0.15';
+    }, 150);
+}
 socket.on('connect', () => {
   console.log('CONNECTED:', socket.id);
 });
@@ -75,34 +88,40 @@ socket.on('firefly:fired', (id) => {
   console.log('RECEIVED FIRE FROM:', id, 'MY ID:', socket.id);
   const f = fireflies.get(id);
   if (!f) return;
+    if (myCharge > 0.3) {
+    const effectiveBoost =
+      couplingBoost / Math.max(fireflies.size - 1, 1);
+
+    myCharge += effectiveBoost;
+  }
 
   flash(f);
 
-  // Only respond if you're already reasonably far into your own cycle.
-  // Without this gate, a firefly that just fired gets yanked by every
-  // ambient flash around it — noisy, and a known runaway-feedback risk
-  // in this exact model. This also makes convergence read as clean
-  // bursts instead of constant small jitter.
-  if (myCharge > 0.3) {
-    myCharge += couplingBoost;
-  }
 });
 
-socket.on('fireflies:scattered', (roster) => {
-    for (const [id, data] of Object.entries(roster)) {
-        const f = fireflies.get(id);
+// socket.on('fireflies:scattered', (roster) => {
+//     for (const [id, data] of Object.entries(roster)) {
+//         const f = fireflies.get(id);
 
-        if (!f) continue;
+//         if (!f) continue;
 
-        f.dot.style.setProperty('--x', `${data.x}%`);
-        f.dot.style.setProperty('--y', `${data.y}%`);
-    }
+//         f.dot.style.setProperty('--x', `${data.x}%`);
+//         f.dot.style.setProperty('--y', `${data.y}%`);
+//     }
+// });
+
+socket.on('firefly:scattered' ,() => {
+  myCharge = Math.random();
+  myPeriod = 2.5 + Math.random() * 1.0;
+   for (const f of fireflies.values()) {
+        scatterBlink(f); }
 });
 
 socket.on('userDisconnected', (id) => {
   const f = fireflies.get(id);
   if (!f) return;
   clearTimeout(f.fadeTimeout);
+  clearTimeout(f.scatterTimeout);
   f.dot.remove();
   fireflies.delete(id);
   updateStatus();
@@ -137,4 +156,10 @@ const couplingValue = document.querySelector('#coupling-value');
 couplingSlider?.addEventListener('input', () => {
   couplingBoost = parseFloat(couplingSlider.value);
   couplingValue.textContent = couplingBoost.toFixed(2);
+});
+
+const scatterButton = document.querySelector('.scatter-button');
+
+scatterButton?.addEventListener('click', () => {
+  socket.emit('firefly:scatter');
 });

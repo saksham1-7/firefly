@@ -88,7 +88,7 @@ socket.on('firefly:fired', (id) => {
   console.log('RECEIVED FIRE FROM:', id, 'MY ID:', socket.id);
   const f = fireflies.get(id);
   if (!f) return;
-    if (myCharge > 0.3) {
+    if (myCharge > 0.05) {
     const effectiveBoost =
       couplingBoost / Math.max(fireflies.size - 1, 1);
 
@@ -138,7 +138,7 @@ function tick(now) {
   myCharge += dt / myPeriod;
 
   if (myCharge >= 1) {
-    myCharge = 0;
+    myCharge %= 1;
     const me = fireflies.get(socket.id);
     if (me) flash(me);
     socket.emit('firefly:fire');

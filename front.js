@@ -8,7 +8,7 @@ const fireflies = new Map();
 let myCharge = 0;
 let myPeriod = 2.5 + Math.random() * 1.0;
 
-let couplingBoost = 0.1;
+let couplingBoost = 0.35;
 
 const prefersReducedMotion = window.matchMedia(
   '(prefers-reduced-motion: reduce)'

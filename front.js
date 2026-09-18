@@ -6,7 +6,7 @@ const socket = io();
 const fireflies = new Map();
 
 let myCharge = Math.random();
-let myPeriod = 2.5 + Math.random() * 0.5;
+let myPeriod = 2.5 + Math.random() * 1;
 
 let couplingBoost = 0.35;
 
@@ -85,18 +85,21 @@ socket.on('firefly:joined', ({ id, x, y }) => {
 });
 
 socket.on('firefly:fired', (id) => {
-  console.log('RECEIVED FIRE FROM:', id, 'MY ID:', socket.id);
   const f = fireflies.get(id);
-  if (!f) return;
-    if (myCharge > 0.05) {
-    const effectiveBoost =
-      couplingBoost / Math.max(fireflies.size - 1, 1);
+  if (!f) {
+    console.log('FIRE FROM UNKNOWN PEER — not in my local map:', id);
+    return;
+  }
 
+  if (myCharge > 0.3) {
+    const effectiveBoost = couplingBoost / Math.max(fireflies.size - 1, 1);
     myCharge += effectiveBoost;
+    console.log(`BOOSTED → myCharge=${myCharge.toFixed(3)} (+${effectiveBoost.toFixed(3)}), swarm size=${fireflies.size}`);
+  } else {
+    console.log(`GATE BLOCKED → myCharge=${myCharge.toFixed(3)} is below 0.3, no boost applied`);
   }
 
   flash(f);
-
 });
 
 // socket.on('fireflies:scattered', (roster) => {
@@ -127,6 +130,18 @@ socket.on('userDisconnected', (id) => {
   updateStatus();
 });
 
+socket.on('coupling:current', (value) => {
+  couplingBoost = value;
+  if (couplingSlider) couplingSlider.value = value;
+  couplingValue.textContent = value.toFixed(2);
+});
+
+socket.on('coupling:changed', (value) => {
+  couplingBoost = value;
+  if (couplingSlider) couplingSlider.value = value;
+  couplingValue.textContent = value.toFixed(2);
+});
+
 let lastTime = performance.now();
 
 function tick(now) {
@@ -154,8 +169,10 @@ const couplingSlider = document.querySelector('#coupling-slider');
 const couplingValue = document.querySelector('#coupling-value');
 
 couplingSlider?.addEventListener('input', () => {
-  couplingBoost = parseFloat(couplingSlider.value);
-  couplingValue.textContent = couplingBoost.toFixed(2);
+  const value = parseFloat(couplingSlider.value);
+  couplingBoost = value;
+  couplingValue.textContent = value.toFixed(2);
+  socket.emit('coupling:change', value);
 });
 
 const scatterButton = document.querySelector('.scatter-button');

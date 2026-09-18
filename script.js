@@ -11,6 +11,7 @@ const io = new Server(server);
 app.use(express.static(path.join(__dirname)));
 
 const fireflies = new Map();
+let sharedCoupling = 0.35
 
 io.on('connection',(socket) => {
     console.log(`firefly arrived : ${socket.id}`);
@@ -22,6 +23,7 @@ const state = {
  fireflies.set(socket.id, state);
 
 socket.emit('firefly:roster', Object.fromEntries(fireflies));
+socket.emit('coupling:current', sharedCoupling);
 socket.broadcast.emit('firefly:joined', { id: socket.id, ...state });
 
 socket.on('firefly:fire', () => {
@@ -33,7 +35,10 @@ socket.on('firefly:fire', () => {
   socket.on('firefly:scatter', () => {
     io.emit('firefly:scattered');
   });
-
+  socket.on('coupling:change', (value) => {
+  sharedCoupling = value;
+  io.emit('coupling:changed', value); // io, not socket.broadcast — sender's own slider stays in sync too
+});
     socket.on('disconnect', () => {
         fireflies.delete(socket.id);
         socket.broadcast.emit('userDisconnected', socket.id);

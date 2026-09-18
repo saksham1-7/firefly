@@ -6,9 +6,9 @@ const socket = io();
 const fireflies = new Map();
 
 let myCharge = Math.random();
-let myPeriod = 2.5 + Math.random() * 1;
+let myPeriod =2.75+ Math.random() * 0.5;
 
-let couplingBoost = 0.35;
+let couplingBoost = 0.20;
 
 const prefersReducedMotion = window.matchMedia(
   '(prefers-reduced-motion: reduce)'
@@ -116,7 +116,7 @@ socket.on('firefly:fired', (id) => {
 
 socket.on('firefly:scattered' ,() => {
   myCharge = Math.random();
-  myPeriod = 2.5 + Math.random() * 1.0;
+  myPeriod =2.75+ Math.random() * 0.5;
    for (const f of fireflies.values()) {
         scatterBlink(f); }
 });

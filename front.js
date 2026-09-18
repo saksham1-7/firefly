@@ -37,15 +37,15 @@ function flash(f) {
 
   f.dot.style.transition = prefersReducedMotion
     ? 'none'
-    : 'opacity 100ms ease-out';
+    : 'opacity 150ms ease-out';
   f.dot.style.opacity = '1';
 
   f.fadeTimeout = setTimeout(() => {
     f.dot.style.transition = prefersReducedMotion
       ? 'none'
-      : 'opacity 250ms ease-in';
+      : 'opacity 800ms ease-in';
     f.dot.style.opacity = '0.15';
-  }, 100);
+  }, 150);
 }
 
 function updateStatus() {
@@ -85,6 +85,7 @@ socket.on('firefly:joined', ({ id, x, y }) => {
 });
 
 socket.on('firefly:fired', (id) => {
+    console.log(`[${Date.now()}] PEER ${id} FIRED, myCharge=${myCharge.toFixed(3)}`);
   const f = fireflies.get(id);
   if (!f) {
     console.log('FIRE FROM UNKNOWN PEER — not in my local map:', id);
@@ -156,6 +157,7 @@ function tick(now) {
     myCharge %= 1;
     const me = fireflies.get(socket.id);
     if (me) flash(me);
+    console.log(`[${Date.now()}] I FIRED`);
     socket.emit('firefly:fire');
   }
 
